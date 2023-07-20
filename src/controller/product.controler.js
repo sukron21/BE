@@ -104,47 +104,34 @@ const productController = {
         // const image=req.file.filename
         // eslint-disable-next-line camelcase
         const { product_name, pricej, stock, description, priceb } = req.body
-        // let photo;
-        // if (req.file) {
-        //     photo = await cloudinary.uploader.upload(req.file.path);
-        //   }
-        //   productModel
-        //   .selectProductbyID(id)
-        //   .then(async (results) => {
-        //     const datas = await results.rows[0]
-        //     // console.log("datas",datas)
-        //     // console.log(datas)
-        //     if(photo !== undefined) {
-        //     //   console.log('1')
-        //       const public_id = datas.photo_pub_id;
-        //     //   console.log(public_id)
-        //       if(public_id !== null) {
-        //         // console.log('test')
-        //         await cloudinary.uploader.destroy(public_id);
-        //       }
-        //     }
         const data = {
             id,
             product_name,
             pricej,
             stock,
-            // photo_pub_id: photo.public_id,
-            // photo_url: photo.url,
             description,
             priceb}
           console.log(data)
-        productModel
-          .updateAccount(data)
-          .then((result) => {
-            success(res, result, 'success', 'update product success')
-          })
-          .catch((err) => {
-            failed(res, err.message, 'failed', 'update product failed')
-          })
-        // })
-        // .catch((err) => {
-        //     failed(res, err.message, 'failed', 'delete product failed')
-        //   })
+          productModel
+          .selectProduct(product_name)
+            .then((result)=>{
+              console.log(`nih ${result}`)
+              if(result.rowCount === 0){
+              productModel
+              .updateAccount(data)
+              .then((result) => {
+                success(res, result, 'success', 'update product success')
+              })
+              .catch((err) => {
+                failed(res, err.message, 'failed', 'update product failed')
+              })}
+              else{
+                failed(res, null, 'failed', `name of product already taken`);   
+              }
+            })
+            .catch((err) => {
+              failed(res, err.message, 'failed', `failed to check name of product`);
+            }) 
       },
       updatePhoto: async(req, res) => {
         const id = req.params.id
